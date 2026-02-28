@@ -1,0 +1,115 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f4f7f6;
+  color: #333;
+}
+
+.dashboard-container {
+  max-width: 1200px; /* Made this wider to fit both columns */
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  color: #2c3e50;
+  font-size: 2.5rem;
+}
+
+.header p {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+/* The magic for the two columns */
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr; /* Left side (chart) is wider than right side */
+  gap: 2rem;
+  align-items: start;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.chart-card {
+  height: 100%;
+  min-height: 450px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-wrapper {
+  flex-grow: 1;
+  width: 100%;
+  margin-top: 1rem;
+  min-height: 350px;
+}
+
+.card h3 {
+  margin-bottom: 1rem;
+  color: #27ae60;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 0.5rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+  font-size: 1.1rem;
+}
+
+.recommendation-panel {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border-left: 5px solid #f39c12;
+}
+
+.recommendation-panel h2 {
+  margin-bottom: 1rem;
+  color: #d35400;
+  font-size: 1.4rem;
+}
+
+.suggestion-list {
+  list-style-type: none;
+}
+
+.suggestion-item {
+  background: #fff3e0;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #e67e22;
+}
+
+/* Make it stack on smaller screens (like phones) */
+@media (max-width: 900px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
