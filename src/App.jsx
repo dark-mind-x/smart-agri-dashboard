@@ -23,39 +23,34 @@ const analytics = getAnalytics(app);
 const database = getDatabase(app);
 
 function App() {
-  // State to hold the history of readings for the chart
   const [history, setHistory] = useState([]);
   
-  // State to hold the single latest reading for the cards
+  // Added phValue to the initial state
   const [currentData, setCurrentData] = useState({
-    temperature: 0, humidity: 0, soilMoisture: 0, rainIntensity: 0, nitrogen: 0, phosphorus: 0, potassium: 0
+    temperature: 0, humidity: 0, soilMoisture: 0, rainIntensity: 0, phValue: 0, nitrogen: 0, phosphorus: 0, potassium: 0
   });
 
   useEffect(() => {
-    // Point to the exact node where the ESP32 is writing data ("agriData")
     const dataRef = ref(database, 'agriData');
     
-    // Listen for changes in real-time
     const unsubscribe = onValue(dataRef, (snapshot) => {
       const data = snapshot.val();
       
       if (data) {
-        // Map the incoming Firebase data
         const newData = {
           time: new Date().toLocaleTimeString(),
           temperature: data.temperature || 0,
           humidity: data.humidity || 0,
           soilMoisture: data.soilMoisture || 0,
           rainIntensity: data.rainIntensity || 0,
+          phValue: data.phValue || 0, // Mapping the new pH data
           nitrogen: data.nitrogen || 0,
           phosphorus: data.phosphorus || 0,
           potassium: data.potassium || 0
         };
 
-        // Update the cards with the latest data
         setCurrentData(newData);
         
-        // Update the chart history (keep only the last 7 readings)
         setHistory(prevHistory => {
           const updatedHistory = [...prevHistory, newData];
           if (updatedHistory.length > 7) {
@@ -66,16 +61,26 @@ function App() {
       }
     });
 
-    // Cleanup the listener when the component unmounts
     return () => unsubscribe();
   }, []);
 
-  // Recommendation Engine Logic
+  // Updated Recommendation Engine Logic to include pH
   const getRecommendations = () => {
     const suggestions = [];
+    
     if (currentData.soilMoisture < 30 && currentData.rainIntensity < 20) {
       suggestions.push("💧 Soil is dry and no rain detected. Turn on the water pump.");
     }
+    
+    // pH Recommendations
+    if (currentData.phValue > 0) { // Ensure we have a real reading before recommending
+      if (currentData.phValue < 6.0) {
+        suggestions.push("🧪 Soil is too Acidic: Add agricultural lime or wood ash to raise the pH.");
+      } else if (currentData.phValue > 7.5) {
+        suggestions.push("🧪 Soil is too Alkaline: Add elemental sulfur, peat moss, or pine needles to lower the pH.");
+      }
+    }
+
     if (currentData.nitrogen < 40) {
       suggestions.push("🌱 Low Nitrogen: Add Cow Dung Compost or Urea to promote leaf growth.");
     }
@@ -86,7 +91,6 @@ function App() {
       suggestions.push("🍌 Low Potassium: Add Banana Peel Fertilizer or Wood Ash to boost immunity.");
     }
     
-    // If everything is perfect and we actually have data
     if (suggestions.length === 0 && currentData.temperature !== 0) {
       suggestions.push("✅ Soil health is optimal! No action needed right now.");
     } else if (currentData.temperature === 0) {
@@ -105,7 +109,6 @@ function App() {
 
       <div className="layout-grid">
         
-        {/* LEFT COLUMN: The Chart */}
         <div className="left-column">
           <div className="card chart-card">
             <h3>📈 Live NPK Trends</h3>
@@ -126,7 +129,6 @@ function App() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Stats and Recommendations */}
         <div className="right-column">
           <div className="card">
             <h3>🌡️ Environment</h3>
@@ -138,6 +140,8 @@ function App() {
           <div className="card">
             <h3>🌍 Soil Health</h3>
             <div className="stat-row"><span>Soil Moisture:</span> <strong>{currentData.soilMoisture} %</strong></div>
+            {/* New pH Value display row */}
+            <div className="stat-row"><span>Soil pH Level:</span> <strong>{typeof currentData.phValue === 'number' ? currentData.phValue.toFixed(1) : currentData.phValue}</strong></div>
             <div className="stat-row"><span>Nitrogen (N):</span> <strong>{currentData.nitrogen} mg/kg</strong></div>
             <div className="stat-row"><span>Phosphorus (P):</span> <strong>{currentData.phosphorus} mg/kg</strong></div>
             <div className="stat-row"><span>Potassium (K):</span> <strong>{currentData.potassium} mg/kg</strong></div>
