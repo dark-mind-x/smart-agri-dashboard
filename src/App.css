@@ -60,10 +60,9 @@ body {
 }
 
 .chart-wrapper {
-  flex-grow: 1;
   width: 100%;
-  margin-top: 1rem;
-  min-height: 350px;
+  height: 300px; /* You can adjust this number to fit your screen */
+  min-height: 300px;
 }
 
 .card h3 {
